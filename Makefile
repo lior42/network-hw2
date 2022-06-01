@@ -1,26 +1,21 @@
-# Name of the program - will be located at OUTDIR
-BIN=test
-# Compiler
-CC=gcc
-# Flags, -g was added for debugging
-CFLAGS=-Wall -g
-# build directory
-OUTDIR=build
+SUBDIRS:=$(patsubst %/.,%,$(wildcard */.))
+BINDIR:=bin
+INNERPROGNAME:=prog
 
-# From this point - dont touch... never
-OBJS=$(patsubst src/%.c,%.o, $(wildcard src/*.c))
+all: $(SUBDIRS) $(BINDIR)
 
-all: ${BIN}
+$(SUBDIRS): $(BINDIR)
+	$(MAKE) BIN=prog -C $@/.
+	cp $@/build/prog $(BINDIR)/$@
 
-clean: ${OUTDIR}
-	${RM} -rf ${OUTDIR}
+$(BINDIR):
+	mkdir -p $(BINDIR)
 
-${BIN}: ${OBJS} ${OUTDIR}
-	${CC} ${CFLAGS} ${OUTDIR}/objs/${OBJS} -o ${OUTDIR}/${BIN}
+clean:
+	for dir in $(SUBDIRS); do \
+	$(MAKE) -C $$dir clean; \
+	done
+	mkdir -p $(BINDIR) && rm -rf $(BINDIR)
 
-${OUTDIR}:
-	mkdir -p ${OUTDIR}
-	mkdir -p ${OUTDIR}/objs
+.PHONY: all $(SUBDIRS)
 
-%.o: src/%.c ${OUTDIR}
-	${CC} ${CFLAGS} -c $< -o ${OUTDIR}/objs/$@
