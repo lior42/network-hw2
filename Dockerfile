@@ -12,4 +12,4 @@ RUN cp /proj/build/* . && rm -rf /proj
 COPY run_all.sh .
 RUN chmod +x run_all.sh
 
-CMD ["/output/run_all.sh"]
+CMD ["./run_all.sh"]
