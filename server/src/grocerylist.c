@@ -22,8 +22,6 @@ void groceryListDestroy(GroceryList *self) {
     free(self);
 }
 
-/// will return a random item from the department, note that you must call
-/// groceryDestroy() on the result.
 Grocery *groceryListSearch(GroceryList *self, const char *const department) {
     GroceryList *temp = getSubList(self, department);
     if (getLen(temp) == 0) {
@@ -70,7 +68,6 @@ getSubList(GroceryList *list, const char *const department) {
     return res;
 }
 
-// note that it will copy the grocery
 void groceryListAppend(GroceryList *self, Grocery *item) {
     if (self == NULL)
         return;
@@ -85,9 +82,31 @@ void groceryListAppend(GroceryList *self, Grocery *item) {
     self->Next->Value = cpy;
 }
 
-// just to have a nice printing functions
-char *groceryToString(Grocery *self);
-char *groceryListToString(GroceryList *self);
+char *groceryToString(Grocery *self) { return strdup(self->ProductName); }
+
+char *groceryListToString(GroceryList *self) {
+    if (getLen(self) == 0)
+        return strdup("Empty List");
+
+    char *tmp = "Available Groceries:\n";
+    char *res = calloc(strlen(tmp) + 1, sizeof(char));
+
+    strcat(res, tmp);
+
+    for (GroceryList *iter = self; iter->Next != NULL; iter = iter->Next) {
+        res = realloc(
+            res,
+            strlen(res) + strlen(iter->Value->ProductName) + 3 * sizeof(char)
+        );
+        strcat(res, "\t");
+        strcat(res, iter->Value->ProductName);
+        strcat(res, "\n");
+    }
+
+    res[strlen(res) - 1] = 0;
+
+    return res;
+}
 
 void groceryDestroy(Grocery *self) {
     if (self != NULL) {

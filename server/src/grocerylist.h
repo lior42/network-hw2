@@ -27,7 +27,10 @@ Grocery *groceryListSearch(GroceryList *, const char *const department);
 void groceryListAppend(GroceryList *, Grocery *);
 
 // just to have a nice printing functions
+
+// note - need too call free afterwards
 char *groceryToString(Grocery *);
+// note - need too call free afterwards
 char *groceryListToString(GroceryList *);
 
 void groceryDestroy(Grocery *);

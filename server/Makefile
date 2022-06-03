@@ -10,13 +10,15 @@ OUTDIR=build
 # From this point - dont touch... never
 OBJS=$(patsubst src/%.c,%.o, $(wildcard src/*.c))
 
+OBJSF=$(OBJS:%.o=${OUTDIR}/objs/%.o)
+
 all: ${BIN}
 
 clean: ${OUTDIR}
 	${RM} -rf ${OUTDIR}
 
 ${BIN}: ${OBJS} ${OUTDIR}
-	${CC} ${CFLAGS} ${OUTDIR}/objs/${OBJS} -o ${OUTDIR}/${BIN}
+	${CC} ${CFLAGS} ${OBJSF} -o ${OUTDIR}/${BIN}
 
 ${OUTDIR}:
 	mkdir -p ${OUTDIR}
