@@ -1,5 +1,5 @@
 # Name of the program - will be located at OUTDIR
-BIN=test
+BIN=Server
 # Compiler
 CC=gcc
 # Flags, -g was added for debugging
