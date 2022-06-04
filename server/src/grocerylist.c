@@ -23,6 +23,11 @@ void groceryListDestroy(GroceryList *self) {
 }
 
 Grocery *groceryListSearch(GroceryList *self, const char *const department) {
+    if (self == NULL)
+        return NULL;
+    if (self->Value == NULL)
+        return groceryListSearch(self->Next, department);
+
     GroceryList *temp = getSubList(self, department);
     if (getLen(temp) == 0) {
         groceryListDestroy(temp);
@@ -59,7 +64,7 @@ static int getLen(GroceryList *self) {
 
 static GroceryList *
 getSubList(GroceryList *list, const char *const department) {
-    if (list == NULL)
+    if (list == NULL || list->Value == NULL)
         return groceryListInit();
     GroceryList *res = getSubList(list->Next, department);
     if (strcmp(department, list->Value->Department) == 0) {
@@ -93,7 +98,9 @@ char *groceryListToString(GroceryList *self) {
 
     strcat(res, tmp);
 
-    for (GroceryList *iter = self; iter->Next != NULL; iter = iter->Next) {
+    for (GroceryList *iter = self; iter != NULL; iter = iter->Next) {
+        if (iter->Value == NULL)
+            continue;
         res = realloc(
             res,
             strlen(res) + strlen(iter->Value->ProductName) + 3 * sizeof(char)
