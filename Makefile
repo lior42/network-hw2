@@ -1,21 +1,23 @@
-SUBDIRS:=$(patsubst %/.,%,$(wildcard */.))
-BINDIR:=bin
+BINDIR:=build
 INNERPROGNAME:=prog
+IGNOREDIRS:=.cache $(BINDIR) share .vscode
+
+SUBDIRS:=$(filter-out $(IGNOREDIRS),$(patsubst %/.,%,$(wildcard */.)))
 
 all: $(SUBDIRS) $(BINDIR)
 
 $(SUBDIRS): $(BINDIR)
-	$(MAKE) BIN=prog -C $@/.
+	$(MAKE) BIN=prog CFLAGS="-I $(PWD)/share" -C $@/.
 	cp $@/build/prog $(BINDIR)/$@
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
-clean:
+clean: $(BINDIR)
 	for dir in $(SUBDIRS); do \
 	$(MAKE) -C $$dir clean; \
 	done
-	mkdir -p $(BINDIR) && rm -rf $(BINDIR)
+	rm -rf $(BINDIR)
 
 .PHONY: all $(SUBDIRS)
 

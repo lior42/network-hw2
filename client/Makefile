@@ -3,7 +3,7 @@ BIN=test
 # Compiler
 CC=gcc
 # Flags, -g was added for debugging
-CFLAGS=-Wall -g
+override CFLAGS+=-Wall -g
 # build directory
 OUTDIR=build
 

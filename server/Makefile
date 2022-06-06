@@ -1,14 +1,16 @@
 # Name of the program - will be located at OUTDIR
-BIN=test
+BIN=Server
 # Compiler
 CC=gcc
 # Flags, -g was added for debugging
-CFLAGS=-Wall -g
+override CFLAGS+=-Wall -g
 # build directory
 OUTDIR=build
 
 # From this point - dont touch... never
 OBJS=$(patsubst src/%.c,%.o, $(wildcard src/*.c))
+
+OBJSF=$(OBJS:%.o=${OUTDIR}/objs/%.o)
 
 all: ${BIN}
 
@@ -16,7 +18,7 @@ clean: ${OUTDIR}
 	${RM} -rf ${OUTDIR}
 
 ${BIN}: ${OBJS} ${OUTDIR}
-	${CC} ${CFLAGS} ${OUTDIR}/objs/${OBJS} -o ${OUTDIR}/${BIN}
+	${CC} ${CFLAGS} ${OBJSF} -o ${OUTDIR}/${BIN}
 
 ${OUTDIR}:
 	mkdir -p ${OUTDIR}
