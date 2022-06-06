@@ -34,10 +34,14 @@ Grocery *groceryListSearch(GroceryList *self, const char *const department) {
         return NULL;
     }
     Grocery *res = calloc(1, sizeof(Grocery));
-    GroceryList *iter = self;
+    GroceryList *iter = temp;
     int elements_to_skip = rand() % getLen(temp);
 
     for (int i = 0; i < elements_to_skip; i++) {
+        iter = iter->Next;
+    }
+
+    if (iter->Value == NULL) {
         iter = iter->Next;
     }
 
