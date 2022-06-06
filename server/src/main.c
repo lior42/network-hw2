@@ -1,17 +1,18 @@
 #include "grocerylist.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 void printGroceryList(GroceryList *g);
 void printGrocery(Grocery *g);
 
 int main(void) {
+    srand(time(0));
     GroceryList *my_list = groceryListInit();
     Grocery one = {.Department = "Cleaning", .ProductName = "Bleach"};
-
     Grocery two = {.Department = "Food", .ProductName = "Omlet"};
-
     Grocery three = {.Department = "Food", .ProductName = "Salad"};
+
     groceryListAppend(my_list, &one);
     groceryListAppend(my_list, &two);
     groceryListAppend(my_list, &three);
@@ -21,8 +22,8 @@ int main(void) {
     Grocery *rng = groceryListSearch(my_list, "Food");
 
     printGrocery(rng);
-    groceryDestroy(rng);
 
+    groceryDestroy(rng);
     groceryListDestroy(my_list);
 }
 
