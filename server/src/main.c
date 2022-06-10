@@ -1,4 +1,5 @@
 #include "grocerylist.h"
+#include "setup.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -8,14 +9,7 @@ void printGrocery(Grocery *g);
 
 int main(void) {
     srand(time(0));
-    GroceryList *my_list = groceryListInit();
-    Grocery one = {.Department = "Cleaning", .ProductName = "Bleach"};
-    Grocery two = {.Department = "Food", .ProductName = "Omlet"};
-    Grocery three = {.Department = "Food", .ProductName = "Salad"};
-
-    groceryListAppend(my_list, &one);
-    groceryListAppend(my_list, &two);
-    groceryListAppend(my_list, &three);
+    GroceryList *my_list = setupGroceryList();
 
     printGroceryList(my_list);
 

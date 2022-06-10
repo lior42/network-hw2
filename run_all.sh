@@ -40,3 +40,4 @@ unset c_current_dir
 
 # ##################################################
 # Stage 2 - run tests
+eval "$p_server"
