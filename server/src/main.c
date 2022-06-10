@@ -1,5 +1,8 @@
 #include "grocerylist.h"
+#include "loops.h"
 #include "setup.h"
+#include "shared.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -11,24 +14,19 @@ int main(void) {
     srand(time(0));
     GroceryList *my_list = setupGroceryList();
 
+    printf("List of groceries was created:\n");
     printGroceryList(my_list);
 
-    Grocery *rng = groceryListSearch(my_list, "Food");
+    int fd = setupServer();
+    serverLoop(fd, my_list);
 
-    printGrocery(rng);
+    close(fd);
 
-    groceryDestroy(rng);
     groceryListDestroy(my_list);
 }
 
 void printGroceryList(GroceryList *g) {
     char *p = groceryListToString(g);
-    printf("%s\n", p);
-    free(p);
-}
-
-void printGrocery(Grocery *g) {
-    char *p = groceryToString(g);
     printf("%s\n", p);
     free(p);
 }

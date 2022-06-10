@@ -11,7 +11,7 @@
 #define HW2_SHARE_ERR_OUTPUT stderr
 #endif
 
-inline void validate_or_die(bool cond, const char *fail_message, ...) {
+static inline void validate_or_die(bool cond, const char *fail_message, ...) {
     if (!cond) {
         va_list ap;
         va_start(ap, fail_message);
