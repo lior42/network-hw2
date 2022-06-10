@@ -1,4 +1,3 @@
-
 #include "setup.h"
 #include "grocerylist.h"
 #include "shared.h"
@@ -34,12 +33,12 @@ int setupServer(void) {
     server_addr.sin_port = htons(SERVER_PORT);
 
     validate_or_die(
-        bind(socket_fd, (sockaddr *)&server_addr, sizeof(server_addr)) != 0,
+        bind(socket_fd, (sockaddr *)&server_addr, sizeof(server_addr)) >= 0,
         "Failed to bind server to port %d.\n", SERVER_PORT
     );
 
     validate_or_die(
-        listen(socket_fd, SOMAXCONN),
+        listen(socket_fd, SOMAXCONN) >= 0,
         "Failed to listen for incomming connections.\n"
     );
 

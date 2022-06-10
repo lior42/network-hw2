@@ -19,7 +19,6 @@ int main(void) {
 
     int fd = setupServer();
     serverLoop(fd, my_list);
-
     close(fd);
 
     groceryListDestroy(my_list);
