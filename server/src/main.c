@@ -1,14 +1,13 @@
 #include "grocerylist.h"
+#include "logger.h"
 #include "loops.h"
 #include "setup.h"
 #include "shared.h"
-#include "logger.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 void printGroceryList(GroceryList *g);
-void printGrocery(Grocery *g);
 
 int main(void) {
     srand(time(0));

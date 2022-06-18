@@ -2,7 +2,9 @@
 
 #include "constants.h"
 #include "err_handler.h"
+#include "logger.h"
 
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <stddef.h>

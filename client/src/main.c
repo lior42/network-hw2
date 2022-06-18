@@ -6,6 +6,8 @@
 
 // void printf_nl(const char *idk) { printf("%s\n", idk); }
 
+#include "constants.h"
+#include "err_handler.h"
 #include "logger.h"
 #include "shared.h"
 #include <arpa/inet.h>
@@ -20,44 +22,50 @@
 
 #include <poll.h>
 
-#define MAX 80
-#define PORT 8888
-#define SA struct sockaddr
-
 void func(FILE *sockfd) {
-    struct pollfd p = {.fd = fileno(sockfd), .events = POLLIN};
+    // struct pollfd p = {.fd = fileno(sockfd), .events = POLLIN};
     // char buff[MAX];
     char *tmp_u;
     // int n;
     for (;;) {
+        printf(
+            "Please enter a product to search, and press \"Enter\" afterward:\n"
+        );
         scanf("%ms", &tmp_u);
-        // strcpy(tmp_u, "Food\n");
+
         if (tmp_u != NULL) {
             fputs(tmp_u, sockfd);
             fputc('\n', sockfd);
         }
+
         fflush(sockfd);
+
         logger(tmp_u);
+
         free(tmp_u);
-        tmp_u = NULL;
+        // tmp_u = NULL;
 
-        poll(&p, 1, -1);
-        printf("{.events = %d, .revents = %d}\n", p.events, p.revents);
+        // poll(&p, 1, 30);
+        // printf("{.events = %d, .revents = %d}\n", p.events, p.revents);
 
-        if (p.revents & POLLIN) {
-            fscanf(sockfd, "%ms", &tmp_u);
-            if (tmp_u != NULL) {
-                printf("%s\n", tmp_u);
-            }
+        // if (p.revents & POLLIN) {
+        // rewind(sockfd);
+        fscanf(sockfd, "%ms", &tmp_u);
+        if (tmp_u != NULL) {
+            printf("%s\n", tmp_u);
             logger(tmp_u);
             free(tmp_u);
+        } else {
+            logger("Server Disconnected");
+            break;
         }
+        // }
     }
 }
 
 int main() {
     int sockfd;
-    struct sockaddr_in servaddr;
+    sockaddr_in servaddr;
 
     // socket create and verification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -70,15 +78,16 @@ int main() {
 
     // assign IP, PORT
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    servaddr.sin_port = htons(PORT);
+    servaddr.sin_addr.s_addr = inet_addr(SERVER_ADDRESS);
+    servaddr.sin_port = htons(SERVER_PORT);
 
     // connect the client socket to server socket
-    if (connect(sockfd, (SA *)&servaddr, sizeof(servaddr)) != 0) {
-        printf("connection with the server failed...\n");
-        exit(0);
-    } else
-        printf("connected to the server..\n");
+    validate_or_die(
+        connect(sockfd, (sockaddr *)&servaddr, sizeof(servaddr)) == 0,
+        "Connection Failed, Server is not online."
+    );
+
+    printf("Connected to server..\n");
 
     // function for chat
     FILE *s = fdopen(sockfd, "r+");

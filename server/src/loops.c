@@ -14,6 +14,8 @@ void serverLoop(int server_fd, GroceryList *data) {
     for (;;) {
         int client = accept(server_fd, NULL, NULL);
 
+        logger("Accepted new client.");
+
         // Note - a very simple transformation since now we dont need buffers.
         FILE *to_pass = fdopen(client, "r+");
         clientLoop(to_pass, data);
