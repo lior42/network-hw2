@@ -25,7 +25,8 @@ static void clientLoop(FILE *client_io, GroceryList *data) {
         char *tmp;
         // %ms = malloced string.. useful in this case.
         fscanf(client_io, "%ms", &tmp);
-        logger(tmp);
+        fflush(client_io);
+        // logger(tmp);
         if(tmp == NULL)
         {
             free(tmp);
@@ -40,10 +41,12 @@ static void clientLoop(FILE *client_io, GroceryList *data) {
         }
 
         Grocery *resp = groceryListSearch(data, tmp);
+        
 
         if (resp != NULL) {
             char *tmp2 = groceryToString(resp);
-            puts(tmp2);
+            // puts(tmp2);
+            printf(" From Server sending: %s\n", tmp2);
             fputs(tmp2, client_io);
             free(tmp2);
             groceryDestroy(resp);
