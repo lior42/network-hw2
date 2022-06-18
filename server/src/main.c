@@ -2,7 +2,7 @@
 #include "loops.h"
 #include "setup.h"
 #include "shared.h"
-
+#include "logger.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

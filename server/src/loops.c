@@ -1,7 +1,7 @@
 #include "loops.h"
 #include "grocerylist.h"
 #include "shared.h"
-
+#include "logger.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,9 +25,14 @@ static void clientLoop(FILE *client_io, GroceryList *data) {
         char *tmp;
         // %ms = malloced string.. useful in this case.
         fscanf(client_io, "%ms", &tmp);
-
-        if (strncmp(
-                tmp, SERVER_END_COMMUNICATION, strlen(SERVER_END_COMMUNICATION)
+        logger(tmp);
+        if(tmp == NULL)
+        {
+            free(tmp);
+            break;
+        }
+        if (strcmp(
+                tmp, SERVER_END_COMMUNICATION
             ) == 0) {
             printf("Client ended conversation.\n");
             free(tmp);
@@ -38,13 +43,14 @@ static void clientLoop(FILE *client_io, GroceryList *data) {
 
         if (resp != NULL) {
             char *tmp2 = groceryToString(resp);
+            puts(tmp2);
             fputs(tmp2, client_io);
             free(tmp2);
             groceryDestroy(resp);
         } else {
             fputs("No matching grocery found.", client_io);
         }
-
+        fflush(client_io);
         free(tmp);
     }
 }
