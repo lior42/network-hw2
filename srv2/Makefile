@@ -8,7 +8,7 @@ override CFLAGS+=-Wall -g
 OUTDIR=build
 
 # From this point - dont touch... never
-OBJS=$(patsubst src/%.c,%.o, $(wildcard src/*.c))
+OBJS=$(patsubst %.c,%.o, $(wildcard *.c))
 
 OBJSF=$(OBJS:%.o=${OUTDIR}/objs/%.o)
 
