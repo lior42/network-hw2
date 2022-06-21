@@ -1,13 +1,28 @@
-CFLAGS = -g -Wall -D_REENTRANT
+# Name of the program - will be located at OUTDIR
+BIN=Server
+# Compiler
+CC=gcc
+# Flags, -g was added for debugging
+override CFLAGS+=-Wall -g
+# build directory
+OUTDIR=build
 
-SRCS = client.c server.c
-OBJS = $(SRCS:%.c=%.o)
-PROGS = $(SRCS:%.c=%)
+# From this point - dont touch... never
+OBJS=$(patsubst src/%.c,%.o, $(wildcard src/*.c))
 
-all : $(PROGS)
+OBJSF=$(OBJS:%.o=${OUTDIR}/objs/%.o)
 
-server4 : server4.o
-	$(CC) -o $@ server4.o -lpthread
+all: ${BIN}
 
-clean :
-	rm -f $(OBJS) $(PROGS)
+clean: ${OUTDIR}
+	${RM} -rf ${OUTDIR}
+
+${BIN}: ${OBJS} ${OUTDIR}
+	${CC} ${CFLAGS} ${OBJSF} -o ${OUTDIR}/${BIN}
+
+${OUTDIR}:
+	mkdir -p ${OUTDIR}
+	mkdir -p ${OUTDIR}/objs
+
+%.o: src/%.c ${OUTDIR}
+	${CC} ${CFLAGS} -c $< -o ${OUTDIR}/objs/$@
