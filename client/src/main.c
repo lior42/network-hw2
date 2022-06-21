@@ -6,90 +6,93 @@
 
 // void printf_nl(const char *idk) { printf("%s\n", idk); }
 
+#include "constants.h"
+#include "err_handler.h"
+#include "logger.h"
+#include "shared.h"
+#include <arpa/inet.h>
 #include <netdb.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/poll.h>
 #include <sys/socket.h>
 #include <time.h>
-#include "logger.h"
-#define MAX 80
-#define PORT 8888
-#define SA struct sockaddr
-#define bzero(a, b) memset(a, EOF, b)
 
+#include <poll.h>
 
-void delay(int number_of_seconds)
-{
-    // Converting time into milli_seconds
-    int milli_seconds = 1000 * number_of_seconds;
+void func(FILE *sockfd) {
+    // struct pollfd p = {.fd = fileno(sockfd), .events = POLLIN};
+    // char buff[MAX];
+    char *tmp_u;
+    // int n;
+    for (;;) {
+        printf(
+            "Please enter a product to search, and press \"Enter\" afterward:\n"
+        );
+        scanf("%ms", &tmp_u);
 
-    // Storing start time
-    clock_t start_time = clock();
+        if (tmp_u != NULL) {
+            fputs(tmp_u, sockfd);
+            fputc('\n', sockfd);
+        }
 
-    // looping till required time is not achieved
-    while (clock() < start_time + milli_seconds)
-        ;
-}
-void func(FILE * sockfd)
-{
-	// char buff[MAX];
-	char * tmp_u = calloc(strlen("Food\n")+1, sizeof(char));
-	// int n;
-	for (;;) {
-		// scanf("%ms",&tmp_u);
-		strcpy(tmp_u, "Food\n");
-		if(tmp_u != NULL)
-		{
-			fputs(tmp_u, sockfd);
-		}
-		fflush(sockfd);
-		logger(tmp_u);
-		free(tmp_u);
-		delay(5);
-		fscanf(sockfd, "%ms", &tmp_u);
-		// logger(tmp_u);
-		if(tmp_u != NULL)
-		{
-			printf("%s\n", tmp_u);
-		}
-		free(tmp_u);
-		break;
-	}
+        fflush(sockfd);
+
+        logger(tmp_u);
+
+        free(tmp_u);
+        // tmp_u = NULL;
+
+        // poll(&p, 1, 30);
+        // printf("{.events = %d, .revents = %d}\n", p.events, p.revents);
+
+        // if (p.revents & POLLIN) {
+        // rewind(sockfd);
+        fscanf(sockfd, "%ms", &tmp_u);
+        if (tmp_u != NULL) {
+            printf("%s\n", tmp_u);
+            logger(tmp_u);
+            free(tmp_u);
+        } else {
+            logger("Server Disconnected");
+            break;
+        }
+        // }
+    }
 }
 
-int main()
-{
-	int sockfd, connfd;
-	struct sockaddr_in servaddr, cli;
+int main() {
+    int sockfd;
+    sockaddr_in servaddr;
 
-	// socket create and verification
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd == -1) {
-		printf("socket creation failed...\n");
-		exit(0);
-	}
-	else
-		printf("Socket successfully created..\n");
-	bzero(&servaddr, sizeof(servaddr));
+    // socket create and verification
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        printf("socket creation failed...\n");
+        exit(0);
+    } else
+        printf("Socket successfully created..\n");
+    bzero(&servaddr, sizeof(servaddr));
 
-	// assign IP, PORT
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	servaddr.sin_port = htons(PORT);
+    // assign IP, PORT
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr(SERVER_ADDRESS);
+    servaddr.sin_port = htons(SERVER_PORT);
 
-	// connect the client socket to server socket
-	if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
-		printf("connection with the server failed...\n");
-		exit(0);
-	}
-	else
-		printf("connected to the server..\n");
+    // connect the client socket to server socket
+    validate_or_die(
+        connect(sockfd, (sockaddr *)&servaddr, sizeof(servaddr)) == 0,
+        "Connection Failed, Server is not online."
+    );
 
-	// function for chat
-	FILE *s=fdopen(sockfd, "r+");
-	func(s);
+    printf("Connected to server..\n");
 
-	// close the socket
-	fclose(s);
+    // function for chat
+    FILE *s = fdopen(sockfd, "r+");
+    func(s);
+
+    // close the socket
+    fclose(s);
 }
