@@ -9,6 +9,7 @@ int main(int argc,char**argv)
        int sockfd,newsockfd,clength;
        struct sockaddr_in serv_addr,cli_addr;
        char buffer[4096];
+       char sendMe[4096] = "Some some";
        sockfd=socket(AF_INET,SOCK_STREAM,0);
        serv_addr.sin_family=AF_INET;
        serv_addr.sin_addr.s_addr=INADDR_ANY;
@@ -21,9 +22,9 @@ int main(int argc,char**argv)
        while(buffer!="quit")
        {
          printf("\nClient message: %s",buffer);
-         printf("\nType your message : ");
-         fgets(buffer,4096,stdin);
-         write(newsockfd,buffer,4096);
+        //  printf("\nType your message : ");
+        //  fgets(buffer,4096,stdin);
+         write(newsockfd,sendMe,4096);
          printf("\n");
          read(newsockfd,buffer,4096);
        }
