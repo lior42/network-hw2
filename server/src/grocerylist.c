@@ -29,7 +29,7 @@ Grocery *groceryListSearch(GroceryList *self, const char *const department) {
         return groceryListSearch(self->Next, department);
 
     GroceryList *temp = getSubList(self, department);
-    if (getLen(temp) == 0) {
+    if (getLen(temp) < 2) {
         groceryListDestroy(temp);
         return NULL;
     }
