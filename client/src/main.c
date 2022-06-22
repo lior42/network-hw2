@@ -12,26 +12,33 @@
 #include "shared.h"
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <netinet/in.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
-#include<sys/types.h>
-#include<netinet/in.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 void func(int sockfd) {
     char buffer[4096] = {0};
-    while(strcmp(buffer, SERVER_END_COMMUNICATION) != 0) 
-       {
-         write(sockfd,buffer,4096);
-         read(sockfd,buffer,4096);
-         printf("\n");
-         printf("\nServer message:\t%s",buffer);
-         printf("\nType your message:\t");
-         fgets(buffer,4096,stdin);
-       }
+    for (;;) {
+        printf("\n");
+        printf("\nType your message:\t");
+        fgets(buffer, 4096, stdin);
+        buffer[strlen(buffer) - 1] = 0;
+        if (strcmp(buffer, "quit") == 0)
+            break;
+        write(sockfd, buffer, 4096);
+        fsync(sockfd);
+        read(sockfd, buffer, 4096);
+        fsync(sockfd);
+        printf("\nServer message:\t%s", buffer);
+    }
+    strcpy(buffer, SERVER_END_COMMUNICATION);
+    write(sockfd, buffer, 4096);
 }
 
 int main() {

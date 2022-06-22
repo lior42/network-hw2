@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
 
@@ -24,6 +25,7 @@ void serverLoop(int server_fd, GroceryList *data) {
 static void clientLoop(int client_io, GroceryList *data) {
     char inp_buff[4096] = {0};
     for (;;) {
+        bzero(inp_buff, 4096);
         ssize_t is_end = read(client_io, inp_buff, 4095);
         if (is_end == -1) {
             logger("Unknown failure to read");
@@ -38,6 +40,9 @@ static void clientLoop(int client_io, GroceryList *data) {
             break;
         }
 
+        if (strlen(inp_buff) < 1)
+            continue;
+
         char print_tmp[512] = {0};
         sprintf(print_tmp, "Client requested: %s.", inp_buff);
         logger(print_tmp);
@@ -47,6 +52,7 @@ static void clientLoop(int client_io, GroceryList *data) {
             char *to_send = groceryToString(res);
 
             sprintf(print_tmp, "Found result: %s", to_send);
+            logger(print_tmp);
             write(client_io, to_send, strlen(to_send) + 1);
 
             free(to_send);
