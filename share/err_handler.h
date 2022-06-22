@@ -11,6 +11,8 @@
 #define HW2_SHARE_ERR_OUTPUT stderr
 #endif
 
+// validate_or_die - if cond is false, will print fail_message (similar to
+// printf) and force exit the program
 static inline void validate_or_die(bool cond, const char *fail_message, ...) {
     if (!cond) {
         va_list ap;

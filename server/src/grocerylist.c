@@ -94,7 +94,7 @@ void groceryListAppend(GroceryList *self, Grocery *item) {
 char *groceryToString(Grocery *self) { return strdup(self->ProductName); }
 
 char *groceryListToString(GroceryList *self) {
-    if (getLen(self) == 0)
+    if (getLen(self) < 2)
         return strdup("Empty List");
 
     char *tmp = "Available Groceries:\n";
