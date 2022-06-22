@@ -1,5 +1,6 @@
 BINDIR:=build
 INNERPROGNAME:=prog
+
 IGNOREDIRS:=.cache $(BINDIR) share .vscode ref srv2
 
 SUBDIRS:=$(filter-out $(IGNOREDIRS),$(patsubst %/.,%,$(wildcard */.)))

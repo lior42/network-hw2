@@ -18,49 +18,20 @@
 #include <string.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
-#include <time.h>
+#include<sys/types.h>
+#include<netinet/in.h>
 
-#include <poll.h>
-
-void func(FILE *sockfd) {
-    // struct pollfd p = {.fd = fileno(sockfd), .events = POLLIN};
-    // char buff[MAX];
-    char *tmp_u;
-    // int n;
-    for (;;) {
-        printf(
-            "Please enter a product to search, and press \"Enter\" afterward:\n"
-        );
-        scanf("%ms", &tmp_u);
-
-        if (tmp_u != NULL) {
-            fputs(tmp_u, sockfd);
-            fputc('\n', sockfd);
-        }
-
-        fflush(sockfd);
-
-        logger(tmp_u);
-
-        free(tmp_u);
-        // tmp_u = NULL;
-
-        // poll(&p, 1, 30);
-        // printf("{.events = %d, .revents = %d}\n", p.events, p.revents);
-
-        // if (p.revents & POLLIN) {
-        // rewind(sockfd);
-        fscanf(sockfd, "%ms", &tmp_u);
-        if (tmp_u != NULL) {
-            printf("%s\n", tmp_u);
-            logger(tmp_u);
-            free(tmp_u);
-        } else {
-            logger("Server Disconnected");
-            break;
-        }
-        // }
-    }
+void func(int sockfd) {
+    char buffer[4096] = {0};
+    while(strcmp(buffer, SERVER_END_COMMUNICATION) != 0) 
+       {
+         write(sockfd,buffer,4096);
+         read(sockfd,buffer,4096);
+         printf("\n");
+         printf("\nServer message:\t%s",buffer);
+         printf("\nType your message:\t");
+         fgets(buffer,4096,stdin);
+       }
 }
 
 int main() {
@@ -90,9 +61,8 @@ int main() {
     printf("Connected to server..\n");
 
     // function for chat
-    FILE *s = fdopen(sockfd, "r+");
-    func(s);
+    func(sockfd);
 
     // close the socket
-    fclose(s);
+    close(sockfd);
 }
