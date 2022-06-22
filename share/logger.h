@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 
+// Some nice logging function
 static inline void logger(const char *message) {
     time_t now;
     time(&now);

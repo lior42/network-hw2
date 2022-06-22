@@ -1,4 +1,5 @@
 #include "loops.h"
+#include "constants.h"
 #include "grocerylist.h"
 #include "logger.h"
 #include "shared.h"
@@ -8,58 +9,52 @@
 #include <sys/poll.h>
 #include <sys/socket.h>
 
-static void clientLoop(FILE *client_io, GroceryList *data);
+static void clientLoop(int client_io, GroceryList *data);
 
 void serverLoop(int server_fd, GroceryList *data) {
     for (;;) {
         int client = accept(server_fd, NULL, NULL);
 
         logger("Accepted new client.");
-
-        // Note - a very simple transformation since now we dont need buffers.
-        FILE *to_pass = fdopen(client, "r+");
-        clientLoop(to_pass, data);
-        fclose(to_pass);
+        clientLoop(client, data);
+        close(client);
     }
 }
 
-static void clientLoop(FILE *client_io, GroceryList *data) {
-    struct pollfd p = {.fd = fileno(client_io), .events = POLLIN};
-    char *tmp;
-
+static void clientLoop(int client_io, GroceryList *data) {
+    char inp_buff[4096] = {0};
     for (;;) {
-        // %ms = malloced string.. useful in this case.
-        poll(&p, 1, -1);
-        printf("{.events = %d, .revents = %d}\n", p.events, p.revents);
-        if (p.revents & POLLIN) {
-            fscanf(client_io, "%ms", &tmp);
-            logger(tmp);
-            if (tmp == NULL) {
-                free(tmp);
-                break;
-            }
-            if (strcmp(tmp, SERVER_END_COMMUNICATION) == 0) {
-                printf("Client ended conversation.\n");
-                free(tmp);
-                break;
-            }
-
-            Grocery *resp = groceryListSearch(data, tmp);
-
-            if (resp != NULL) {
-                char *tmp2 = groceryToString(resp);
-                fprintf(client_io, "%s\n", tmp2);
-                fflush(client_io);
-                free(tmp2);
-                groceryDestroy(resp);
-            } else {
-                fputs("No matching grocery found.\n", client_io);
-            }
-
-            fflush(client_io);
-
-            free(tmp);
-            tmp = NULL;
+        ssize_t is_end = read(client_io, inp_buff, 4095);
+        if (is_end == -1) {
+            logger("Unknown failure to read");
+            continue;
+        } else if (is_end == 0) {
+            logger("Client disconnected.");
+            break;
         }
+
+        if (strcmp(inp_buff, SERVER_END_COMMUNICATION) == 0) {
+            logger("Client requested to end communication");
+            break;
+        }
+
+        char print_tmp[512] = {0};
+        sprintf(print_tmp, "Client requested: %s.", inp_buff);
+        logger(print_tmp);
+
+        Grocery *res = groceryListSearch(data, inp_buff);
+        if (res != NULL) {
+            char *to_send = groceryToString(res);
+
+            sprintf(print_tmp, "Found result: %s", to_send);
+            write(client_io, to_send, strlen(to_send) + 1);
+
+            free(to_send);
+        } else {
+            char to_send[] = "Not Matching Product Found.";
+            logger(to_send);
+            write(client_io, to_send, strlen(to_send) + 1);
+        }
+        groceryDestroy(res);
     }
 }
