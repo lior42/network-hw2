@@ -24,11 +24,13 @@ void serverLoop(int server_fd, GroceryList *data) {
 
 static void clientLoop(int client_io, GroceryList *data) {
     char inp_buff[4096] = {0};
+    char print_tmp[8196] = {0};
+
     for (;;) {
         bzero(inp_buff, 4096);
         ssize_t is_end = read(client_io, inp_buff, 4095);
         if (is_end == -1) {
-            logger("Unknown failure to read");
+            logger("Unknown failure to read.");
             continue;
         } else if (is_end == 0) {
             logger("Client disconnected.");
@@ -36,14 +38,14 @@ static void clientLoop(int client_io, GroceryList *data) {
         }
 
         if (strcmp(inp_buff, SERVER_END_COMMUNICATION) == 0) {
-            logger("Client requested to end communication");
+            logger("Client requested to end communication.");
             break;
         }
 
+        // Unknown why but that sometimes happens.
         if (strlen(inp_buff) < 1)
             continue;
 
-        char print_tmp[512] = {0};
         sprintf(print_tmp, "Client requested: %s.", inp_buff);
         logger(print_tmp);
 

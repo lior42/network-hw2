@@ -7,9 +7,11 @@
 GroceryList *setupGroceryList(void) {
     GroceryList *ret = groceryListInit();
     Grocery arr[] = {
-        {.Department = "Cleaning", .ProductName = "Bleach"},
-        {.Department = "Food", .ProductName = "Omlet"},
-        {.Department = "Food", .ProductName = "Salad"}};
+        {.Department = "Cleaning", .ProductName = "Saint Moritz"},
+        {.Department = "Hamburger", .ProductName = "McDonalds"},
+        {.Department = "Sushi", .ProductName = "Japanica"},
+        {.Department = "Milk", .ProductName = "Tara"},
+        {.Department = "Pizza", .ProductName = "Dominos"}};
 
     size_t s = sizeof(arr) / sizeof(Grocery);
 

@@ -26,8 +26,11 @@ void func(int sockfd) {
     char buffer[4096] = {0};
     for (;;) {
         printf("\n");
-        printf("\nType your message:\t");
+        printf(
+            "\nEnter a term to search (Enter \"quit\" to end converstation):\n"
+        );
         fgets(buffer, 4096, stdin);
+        // Remove \n at the end.
         buffer[strlen(buffer) - 1] = 0;
         if (strcmp(buffer, "quit") == 0)
             break;
@@ -35,23 +38,26 @@ void func(int sockfd) {
         fsync(sockfd);
         read(sockfd, buffer, 4096);
         fsync(sockfd);
-        printf("\nServer message:\t%s", buffer);
+        printf("\nServer answer:\t%s", buffer);
     }
     strcpy(buffer, SERVER_END_COMMUNICATION);
     write(sockfd, buffer, 4096);
+
+    printf("\nBye Bye!\n");
 }
 
-int main() {
+int main(void) {
     int sockfd;
     sockaddr_in servaddr;
 
     // socket create and verification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
-        printf("socket creation failed...\n");
+        printf("Socket creation failed...\n");
         exit(0);
-    } else
-        printf("Socket successfully created..\n");
+    }
+
+    printf("Socket successfully created..\n");
     bzero(&servaddr, sizeof(servaddr));
 
     // assign IP, PORT
